@@ -45,12 +45,12 @@ class faceMsgControler {
     }
 
     static async readAllUser(req, res) {
-        try {//incorrect readallusers
-            console.log(req.params.email)
+        try {
+
             let faceMsg = await Msgs.find({ Email: req.params.email }, (err)=>{
                 if (err) throw err;
             })
-            console.log(faceMsg)
+
             if (!faceMsg || (Object.keys(faceMsg))==0) throw {
                 status: 204,
                 msg: "no msg found"
@@ -106,7 +106,7 @@ class faceMsgControler {
     static async update(req, res) {
         console.log(req.body)
         try {
-           // this.verId(req.params.id);
+           this.verId(req.params.id);
             let obj = await Msgs.find({_id:req.params.id},(err)=>{
                 if (err) throw err;
             })
@@ -144,7 +144,6 @@ class faceMsgControler {
     }
 
     static verId(id) {
-        console.log(id)
         if (!mongoose.Types.ObjectId.isValid(id)) throw {
             status: 204,
             msg: "invalid object id"
