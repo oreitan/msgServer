@@ -23,6 +23,8 @@ class faceMsgControler {
             res.status(200).json(test);
         }
         catch (err) {
+            if(!err.status) err.status = 500;
+            if(!err.msg) err.msg = 'internal error';
             res.status(err.status).send(err.msg)
         };
     }
@@ -36,8 +38,9 @@ class faceMsgControler {
             }
             res.status(200).json(faceMsg);
         } catch (err) {
-
-            res.status(err.status).send(err.msg);
+            if(!err.status) err.status = 500;
+            if(!err.msg) err.msg = 'internal error';
+            res.status(err.status).send(err.msg)
         }
     }
 
@@ -54,6 +57,8 @@ class faceMsgControler {
             }
             res.status(200).send(faceMsg);
         } catch (err) {
+            if(!err.status) err.status = 500;
+            if(!err.msg) err.msg = 'internal error';
             res.status(err.status).send(err.msg)
 
         }
@@ -61,7 +66,7 @@ class faceMsgControler {
 
     static async delete(req, res) {
         try {
-            this.verId(req.body.id);
+            this.verId(req.params.id);
             let faceMsg = await Msgs.deleteOne({ _id: req.params.id }, (err)=>{
                 if (err) throw err;
             })
@@ -71,21 +76,23 @@ class faceMsgControler {
             }
             res.status(200).send(faceMsg);
         } catch (err) {
-            res.status(err.status).send(msg)
+            if(!err.status) err.status = 500;
+            if(!err.msg) err.msg = 'internal error';
+            res.status(err.status).send(err.msg)
         }
     }
 
     static async read(req, res) {
         try {
-            this.verId(req.body.id);
+            this.verId(req.params.id);
             let faceMsg = await Msgs.findOne({ _id: req.params.id }, (err)=>{
                 if (err) throw err;
             })
-            if (!faecMsg) throw {
+            if (!faceMsg) throw {
                 status: 204,
                 msg: "no msg found"
             }
-            res.status(200).json(faceMsg);
+            res.status(200).send(faceMsg);
         }
         catch (err) {
             console.log(err);
@@ -99,23 +106,28 @@ class faceMsgControler {
     static async update(req, res) {
         console.log(req.body)
         try {
-            this.verId(req.params.id);
+           // this.verId(req.params.id);
             let obj = await Msgs.find({_id:req.params.id},(err)=>{
                 if (err) throw err;
             })
+            
             if (!obj || obj.length < 0) throw {
                 status: 204,
                 msg: "no msg in DB"
             }
-            if(req.body.likes && req.body.likes >=0)
+
+            obj = obj[0];
+            if(req.body.like && req.body.like >=0)
             {
-                obj.likes = req.body.likes;
+                obj.like = req.body.like;
+                
             }
-            if(req.body.msg && req.body,msg.length > 0)
+            if(req.body.msg && req.body.msg.length > 0)
             {
                 obj.msg = req.body.msg;
             }
-            let faecMsg = await Msgs.updateOne({ _id: req.params.id }, obj, (err)=>{
+            
+            let faceMsg = await Msgs.updateOne({ _id: req.params.id }, obj, (err)=>{
                 if (err) throw err;
             })
             if (faceMsg.nModified == 0) throw {
@@ -125,11 +137,14 @@ class faceMsgControler {
             res.status(200).json(faceMsg);
         }
         catch (err) {
+            if(!err.status) err.status = 500;
+            if(!err.msg) err.msg = 'something went wrong';
             res.status(err.status).send(err.msg)
         }
     }
 
     static verId(id) {
+        console.log(id)
         if (!mongoose.Types.ObjectId.isValid(id)) throw {
             status: 204,
             msg: "invalid object id"
